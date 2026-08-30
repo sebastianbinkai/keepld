@@ -1,0 +1,7 @@
+[package]
+name = "keepld"
+version = "0.1.0"
+edition = "2021"
+authors = ["Juan S. Alarcon"]
+description = "A developer-centric project lifecycle and structure management engine."
+

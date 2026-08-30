@@ -1,0 +1,8 @@
+# Rust / Cargo
+target/
+
+# Editor / OS
+*.swp
+*.swo
+*~
+.DS_Store
