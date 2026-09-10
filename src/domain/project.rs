@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use super::node::Node;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Project {
     pub id: u64,
     pub name: String,

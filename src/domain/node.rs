@@ -1,14 +1,16 @@
+use serde::{Deserialize, Serialize};
+
 use super::availability::Availability;
-use super::class::Class;
+use super::kind::Kind;
 use super::state::State;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Node {
     pub id: u64,
     pub name: String,
     pub description: String,
     pub availability: Availability,
-    pub class: Class,
+    pub kind: Kind,
     pub state: State,
 }
 
@@ -19,7 +21,7 @@ impl Node {
             name,
             description,
             availability: Availability::Enabled,
-            class: Class::Default,
+            kind: Kind::Element(super::class::ElementClass::Default),
             state: State::Active,
         }
     }
@@ -28,6 +30,7 @@ impl Node {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::domain::class::ElementClass;
 
     #[test]
     fn new_node_has_default_values() {
@@ -41,7 +44,7 @@ mod tests {
         assert_eq!(node.name, "Test node");
         assert_eq!(node.description, "Test description");
         assert_eq!(node.availability, Availability::Enabled);
-        assert_eq!(node.class, Class::Default);
+        assert_eq!(node.kind, Kind::Element(ElementClass::Default));
         assert_eq!(node.state, State::Active);
     }
 }
