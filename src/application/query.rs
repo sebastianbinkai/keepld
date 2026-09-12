@@ -467,4 +467,111 @@ fn cleanup(path: &std::path::Path) {
 
         std::fs::remove_dir_all(&path).unwrap();
     }
+
+    #[test]
+    fn execute_focus_not_found_fails() {
+        let path = temporary_path("focus-not-found");
+
+        initialize_project(
+            &path,
+            1,
+            String::from("Test Project"),
+            String::new(),
+        )
+        .unwrap();
+
+        let result = execute(
+            Query::focus(5),
+            &path,
+        );
+
+        assert!(result.is_err());
+
+        cleanup(&path);
+    }
+
+    #[test]
+    fn execute_focus_can_use_non_primary_position() {
+        let path = temporary_path("focus-non-primary");
+
+        let project = crate::application::project::create_project(
+            &path,
+            1,
+            String::from("Focused Project"),
+            String::new(),
+        )
+        .unwrap();
+
+        let mut context =
+            context_persistence::load(&path).unwrap();
+
+        context.set_focused(
+            3,
+            Reference::Project(project.id),
+        );
+
+        context_persistence::save(
+            &context,
+            &path,
+        )
+        .unwrap();
+
+        let result = execute(
+            Query::focus(3),
+            &path,
+        )
+        .unwrap();
+
+        assert_eq!(
+            result,
+            QueryResult::Project(project)
+        );
+
+        cleanup(&path);
+    }
+
+    #[test]
+    fn execute_verbose_query_returns_same_object() {
+        let path = temporary_path("verbose");
+
+        let project = crate::application::project::create_project(
+            &path,
+            1,
+            String::from("Verbose Project"),
+            String::from("Description"),
+        )
+        .unwrap();
+
+        let mut context =
+            context_persistence::load(&path).unwrap();
+
+        context.set_selected(
+            Reference::Project(project.id),
+        );
+
+        context_persistence::save(
+            &context,
+            &path,
+        )
+        .unwrap();
+
+        let normal = execute(
+            Query::current(),
+            &path,
+        )
+        .unwrap();
+
+        let mut verbose_query = Query::current();
+        verbose_query.detail = QueryDetail::Verbose;
+
+        let verbose = execute(
+            verbose_query,
+            &path,
+        )
+        .unwrap();
+
+        assert_eq!(normal, verbose);
+
+        cleanup(&path);
+    }
 }

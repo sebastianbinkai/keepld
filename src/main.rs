@@ -2,6 +2,7 @@ use std::env;
 use std::path::PathBuf;
 
 use keepld::application::node::create_node;
+use keepld::application::context::focus;
 use keepld::application::project::{
     create_project,
     initialize_project,
@@ -177,6 +178,58 @@ fn main() {
                 .map(|result| {
                     print_result(result, query.detail);
                 })
+        }
+
+        "focus" => {
+            let Some(position) = args.next() else {
+                eprintln!("error: missing focus position");
+                usage();
+                std::process::exit(1);
+            };
+
+            let position: u8 = match position.parse() {
+                Ok(position) => position,
+                Err(_) => {
+                    eprintln!("error: invalid focus position '{}'", position);
+                    std::process::exit(1);
+                }
+            };
+
+            let Some(kind) = args.next() else {
+                eprintln!("error: missing focus reference type");
+                usage();
+                std::process::exit(1);
+            };
+
+            let Some(id) = args.next() else {
+                eprintln!("error: missing focus reference id");
+                usage();
+                std::process::exit(1);
+            };
+
+            let id: u64 = match id.parse() {
+                Ok(id) => id,
+                Err(_) => {
+                    eprintln!("error: invalid focus reference id '{}'", id);
+                    std::process::exit(1);
+                }
+            };
+
+            let reference = match kind.as_str() {
+                "project" => keepld::core::context::Reference::Project(id),
+
+                "node" => keepld::core::context::Reference::Node(id),
+
+                _ => {
+                    eprintln!("error: invalid focus reference type '{}'", kind);
+                    usage();
+                    std::process::exit(1);
+                }
+            };
+
+            let path = PathBuf::from(".");
+
+            focus(&path, position, reference)
         }
 
         _ => {
