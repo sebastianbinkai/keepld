@@ -1,5 +1,6 @@
 pub mod alias;
 pub mod block;
+pub mod tag;
 
 pub mod availability;
 pub mod class;
